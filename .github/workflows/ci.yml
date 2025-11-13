@@ -1,0 +1,38 @@
+name: CI
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    healthcheck:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Copy example configs
+              run: |
+                  cp .env.example .env
+                  cp web/config.example.json web/config.json
+
+            - name: Start services
+              run: |
+                  docker-compose up -d --build
+
+            - name: Wait for backend health
+              run: |
+                  for i in {1..20}; do
+                    if curl -fsS http://localhost:5000/healthz; then exit 0; fi
+                    sleep 3
+                  done
+                  curl -v http://localhost:5000/healthz
+                  exit 1
+
+            - name: Check nginx serves frontend
+              run: |
+                  curl -fsS http://localhost:8000 | head -n 1
+
+            - name: Teardown
+              if: always()
+              run: docker-compose down -v

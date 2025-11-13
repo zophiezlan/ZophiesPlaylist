@@ -2,22 +2,51 @@ var forceRemote = false;
 var inventory = null
 var editor = null;
 var apiLocalPath = 'http://localhost:5000/SmarterPlaylists/';
-var apiRemotePath = 'http://smarterplaylists.playlistmachinery.com/SmarterPlaylists/'
+var apiRemotePath = 'https://smarterplaylists.playlistmachinery.com/SmarterPlaylists/'
 
-var client_id = 'bb61fcfe1423449ba3d8e3b016316316'; // smarter playlists
-var client_id = '31469b011d4941bf8dd4ac9cf8495bac'; // sort your music ID
+// Default Spotify Client ID (overridden by web/config.json when present)
+var client_id = '31469b011d4941bf8dd4ac9cf8495bac';
 
 var local_redirect_uri = 'http://localhost:8000/callback.html';
-var remote_redirect_uri = 'http://static.echonest.com/SmarterPlaylists/callback.html';
-var remote_redirect_uri = 'http://smarterplaylists.playlistmachinery.com/callback.html';
+var remote_redirect_uri = 'https://smarterplaylists.playlistmachinery.com/callback.html';
 
 var local_auth_redirect_uri = 'http://localhost:8000/auth.html';
-var remote_auth_redirect_uri = 'http://static.echonest.com/SmarterPlaylists/auth.html';
-var remote_auth_redirect_uri = 'http://smarterplaylists.playlistmachinery.com/auth.html';
+var remote_auth_redirect_uri = 'https://smarterplaylists.playlistmachinery.com/auth.html';
 
 var apiPath = isLocalHost() ? apiLocalPath : apiRemotePath;
 var redirect_uri = isLocalHost() ? local_redirect_uri : remote_redirect_uri;
 var auth_redirect_uri = isLocalHost() ? local_auth_redirect_uri : remote_auth_redirect_uri;
+
+// Optional config override: web/config.json
+function _applyConfig(cfg) {
+    if (!cfg) return;
+    if (cfg.apiLocalPath) apiLocalPath = cfg.apiLocalPath;
+    if (cfg.apiRemotePath) apiRemotePath = cfg.apiRemotePath;
+    if (cfg.localRedirectUri) local_redirect_uri = cfg.localRedirectUri;
+    if (cfg.remoteRedirectUri) remote_redirect_uri = cfg.remoteRedirectUri;
+    if (cfg.localAuthRedirectUri) local_auth_redirect_uri = cfg.localAuthRedirectUri;
+    if (cfg.remoteAuthRedirectUri) remote_auth_redirect_uri = cfg.remoteAuthRedirectUri;
+    if (cfg.clientId) client_id = cfg.clientId;
+    // Recompute derived values
+    apiPath = isLocalHost() ? apiLocalPath : apiRemotePath;
+    redirect_uri = isLocalHost() ? local_redirect_uri : remote_redirect_uri;
+    auth_redirect_uri = isLocalHost() ? local_auth_redirect_uri : remote_auth_redirect_uri;
+}
+
+function loadAppConfig(callback) {
+    try {
+        $.getJSON('config.json')
+            .done(function (data) {
+                _applyConfig(data);
+                if (typeof callback === 'function') callback();
+            })
+            .fail(function () {
+                if (typeof callback === 'function') callback();
+            });
+    } catch (e) {
+        if (typeof callback === 'function') callback();
+    }
+}
 
 var confirmDelete = true;
 

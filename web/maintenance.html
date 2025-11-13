@@ -68,22 +68,23 @@
     <script src="main.js"></script>
 <script>
 
-$(document).ready(
-    function() {
-      fetchSystemStatus(function(data) {
-          if (data && data.status == "OK") {
-              var systemStatus = data.system_status;
-              $(".version").text(systemStatus.version);
-              if (!systemStatus.maint_mode) {
-                document.location = "index.html"
-              } else {
-                motdInfo(systemStatus.motd);
-              }
-          } else {
-              alert("The SmarterPlaylists server is offline. Try later");
-          }
-      });
+$(document).ready(function() {
+  loadAppConfig(function() {
+    fetchSystemStatus(function(data) {
+        if (data && data.status == "OK") {
+            var systemStatus = data.system_status;
+            $(".version").text(systemStatus.version);
+            if (!systemStatus.maint_mode) {
+              document.location = "index.html"
+            } else {
+              motdInfo(systemStatus.motd);
+            }
+        } else {
+            alert("The SmarterPlaylists server is offline. Try later");
+        }
+    });
   });
+});
 </script>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

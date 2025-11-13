@@ -287,11 +287,11 @@ function initScheduler() {
 }
 
 
-$(document).ready(
-    function() {
-        initScheduler();
-    }
-);
+$(document).ready(function() {
+  loadAppConfig(function() {
+    initScheduler();
+  });
+});
 </script>
 
 <script>

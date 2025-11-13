@@ -134,12 +134,12 @@ function initScheduler() {
 }
 
 
-$(document).ready(
-    function() {
-        maintenanceModeCheck();
-        initScheduler();
-    }
-);
+$(document).ready(function() {
+  loadAppConfig(function() {
+    maintenanceModeCheck();
+    initScheduler();
+  });
+});
 </script>
 
 <script>

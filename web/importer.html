@@ -180,11 +180,11 @@ function initImporter() {
 }
 
 
-$(document).ready(
-    function() {
-        initImporter();
-    }
-);
+$(document).ready(function() {
+  loadAppConfig(function() {
+    initImporter();
+  });
+});
 </script>
 
 <script>

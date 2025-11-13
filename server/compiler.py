@@ -150,7 +150,7 @@ def compile_object(objname, program):
                     return OK, obj
                 except pbl.PBLException as e:
                     #traceback.print_exc()
-                    print 'e reason', e.reason
+                    print('e reason', e.reason)
                     raise pbl.PBLException(None, e.reason, objname)
                 except:
                     traceback.print_exc()
@@ -183,7 +183,7 @@ if __name__ == '__main__':
 
         status, obj = compile(source_obj)
         if status == OK:
-            print 'compiled! = running'
+            print('compiled! = running')
             pbl.show_source(obj, props= ['src', 'duration'])
         else:
-            print 'Whoops', status
+            print('Whoops', status)

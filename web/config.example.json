@@ -1,0 +1,9 @@
+{
+  "apiLocalPath": "http://localhost:5000/SmarterPlaylists/",
+  "apiRemotePath": "https://smarterplaylists.playlistmachinery.com/SmarterPlaylists/",
+  "localRedirectUri": "http://localhost:8000/callback.html",
+  "remoteRedirectUri": "https://smarterplaylists.playlistmachinery.com/callback.html",
+  "localAuthRedirectUri": "http://localhost:8000/auth.html",
+  "remoteAuthRedirectUri": "https://smarterplaylists.playlistmachinery.com/auth.html",
+  "clientId": ""
+}

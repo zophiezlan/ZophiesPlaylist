@@ -1,3 +1,6 @@
+// Deprecated v2 editor: redirect to canonical app (kept for parse compatibility)
+try { window.location.replace('go.html'); } catch (e) {}
+
 var createEditor = function(canvasElem, inventory, types, isReadOnly) {
     var program = new Program(inventory, 'my program');
     let graph = null;

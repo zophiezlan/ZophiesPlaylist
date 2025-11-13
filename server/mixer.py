@@ -35,7 +35,7 @@ class Mixer(object):
             if consecutive_fails >= len(self.source_list):
                 return None
             candidate_track = self.get_next_candidate()
-            if candidate_track == None:
+            if candidate_track is None:
                 if self.fail_fast:
                     return None
                 else:

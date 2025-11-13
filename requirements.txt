@@ -1,0 +1,44 @@
+# Python Dependencies for Smarter Playlists
+# Updated for Python 3.11+
+
+# Web Framework
+Flask==3.0.0
+Flask-CORS==4.0.0
+Werkzeug==3.0.0
+
+# HTTP Requests
+requests==2.31.0
+
+# Redis Client
+redis==5.0.0
+
+# Caching (replacement for werkzeug.contrib.cache)
+cachelib==0.10.0
+
+# Web Servers
+gunicorn==21.0.0
+CherryPy==18.8.0
+
+# JSON handling (simplejson replacement - use built-in json instead)
+# simplejson is no longer needed in Python 3
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Spotify API Client (if using spotipy)
+spotipy==2.23.0
+
+# Echo Nest replacement (may need to find alternative or remove)
+# pyen - likely deprecated, needs review
+
+# PBL (playlist builder library - custom, keep as-is if local)
+# pbl - custom library
+
+# Development Dependencies
+# Uncomment these for development
+# pytest>=7.4.0
+# pytest-cov>=4.1.0
+# black>=23.0.0
+# flake8>=6.1.0
+# isort>=5.12.0
+# mypy>=1.5.0

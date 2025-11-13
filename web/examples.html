@@ -235,11 +235,11 @@ function initApp() {
     });
 }
 
-$(document).ready(
-    function() {
-        initApp();
-    }
-);
+$(document).ready(function() {
+  loadAppConfig(function() {
+    initApp();
+  });
+});
 
 </script>
 <script>

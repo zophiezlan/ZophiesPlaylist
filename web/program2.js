@@ -1,17 +1,8 @@
-Program = function(inventory, name) {
-    this.inventory = inventory;
-    this.name = name;
-    this.main = null;
-    this.description = "my description";
-    this.max_tracks = 1000;
-    this.components = {}
-    this.extra = { },
-    this.trans = {
-        needsSave: true,
-    }
-    this.portTypes = ['green', 'blue', 'red', 'orange'];
-}
+// Deprecated v2 program model. Redirect to canonical app.
+console.warn('program2.js is deprecated and will redirect to go.html');
+try { window.location.replace('go.html'); } catch (e) {}
 
+Program = function() { return {}; }
 
 Program.prototype = {
 
