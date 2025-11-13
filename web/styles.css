@@ -256,3 +256,13 @@ table.sortable thead {
     font-weight: bold;
     cursor: default;
 }
+
+/* Callback page styles */
+#creating, #status {
+    text-align: center;
+}
+
+#done, #error {
+    display: none;
+}
+

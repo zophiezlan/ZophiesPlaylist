@@ -3,9 +3,9 @@ from components import inventory
 import traceback
 
 debug_exceptions = False
-OK = 'ok'
+OK = "ok"
 
-'''
+"""
     Programs are of the form:
 
     {
@@ -40,32 +40,33 @@ OK = 'ok'
         },
         "main": "sorter"
     }
-'''
+"""
+
 
 def convert_val_to_type(val, type, program):
-    if type in inventory['types']:
+    if type in inventory["types"]:
         return OK, val
-    if type == 'string':
+    if type == "string":
         return OK, str(val)
-    elif type == 'string_list':
+    elif type == "string_list":
         return OK, val
-    elif type == 'time':
+    elif type == "time":
         return OK, val
-    elif type == 'optional_date':
+    elif type == "optional_date":
         return OK, val
-    elif type == 'optional_rel_date':
+    elif type == "optional_rel_date":
         return OK, val
-    elif type == 'uri':
+    elif type == "uri":
         return OK, str(val)
-    elif type == 'uri_list':
+    elif type == "uri_list":
         return OK, val
-    elif type == 'number':
-        #return OK, float(val)
+    elif type == "number":
+        # return OK, float(val)
         return OK, val
-    elif type == 'bool':
+    elif type == "bool":
         return OK, bool(val)
-    elif type == 'port':
-        if isinstance(val, basestring):
+    elif type == "port":
+        if isinstance(val, str):
             status, compiled_program = compile_object(val, program)
             return status, compiled_program
         elif isinstance(val, list):
@@ -78,17 +79,17 @@ def convert_val_to_type(val, type, program):
                     return status, None
             return OK, plist
         else:
-            return 'error - bad port type'
-            
-    elif type == 'source':
-        return 'archaic type', type, 'for', val 
+            return "error - bad port type"
+
+    elif type == "source":
+        return "archaic type", type, "for", val
         if val:
             status, compiled_program = compile_object(val, program)
             return status, compiled_program
         else:
-            return 'error - missing source', val
-    elif type == 'source_list':
-        return 'archaic type', type, 'for', val 
+            return "error - missing source", val
+    elif type == "source_list":
+        return "archaic type", type, "for", val
         plist = []
         for name in val:
             status, compiled_program = compile_object(name, program)
@@ -98,45 +99,47 @@ def convert_val_to_type(val, type, program):
                 return status, None
         return OK, plist
     else:
-        return 'unknown type ' + type, None
-            
+        return "unknown type " + type, None
+
 
 def get_param_val(param, val, spec, program):
-    spec_params = spec['params']
+    spec_params = spec["params"]
     if param in spec_params:
         param_spec = spec_params[param]
-        status, outval = convert_val_to_type(val, param_spec['type'], program)
+        status, outval = convert_val_to_type(val, param_spec["type"], program)
         return status, outval
     else:
         return 'unknown param "' + param + '"', None
 
+
 def get_spec_by_type(type):
-    for component in inventory['components']:
-        if type == component['name']:
+    for component in inventory["components"]:
+        if type == component["name"]:
             return component
     return None
-    
+
+
 def compile_object(objname, program):
-    components = program['components']
-    symbols = program['symbols']
-    hsymbols = program['hsymbols']
+    components = program["components"]
+    symbols = program["symbols"]
+    hsymbols = program["hsymbols"]
     if objname in symbols:
         return OK, symbols[objname]
     else:
         if objname in components:
             comp = components[objname]
-            spec = get_spec_by_type(comp['type'])
+            spec = get_spec_by_type(comp["type"])
             if spec:
-                params = { }
+                params = {}
 
-                for param, val in comp['sources'].items():
+                for param, val in comp["sources"].items():
                     status, cval = get_param_val(param, val, spec, program)
                     if status == OK:
                         params[param] = cval
                     else:
                         return status + " in " + objname, None
 
-                for param, val in comp['params'].items():
+                for param, val in comp["params"].items():
                     status, cval = get_param_val(param, val, spec, program)
                     if status == OK:
                         params[param] = cval
@@ -144,13 +147,13 @@ def compile_object(objname, program):
                         return status + " in " + objname, None
 
                 try:
-                    obj = spec['class'](**params)
+                    obj = spec["class"](**params)
                     symbols[objname] = obj
                     hsymbols[obj] = objname
                     return OK, obj
                 except pbl.PBLException as e:
-                    #traceback.print_exc()
-                    print('e reason', e.reason)
+                    # traceback.print_exc()
+                    print("e reason", e.reason)
                     raise pbl.PBLException(None, e.reason, objname)
                 except:
                     traceback.print_exc()
@@ -158,21 +161,22 @@ def compile_object(objname, program):
                         raise
                     raise pbl.PBLException(None, "creation failure", objname)
             else:
-                return 'unknown type ' + comp['type'] + ' for ' + objname, None
+                return "unknown type " + comp["type"] + " for " + objname, None
         else:
-            return 'missing object ' + str(objname), None
-    
+            return "missing object " + str(objname), None
+
+
 def compile(program):
-    if 'main' in program and program['main']:
-        program['symbols'] = {}
-        program['hsymbols'] = {}
-        status, compiled_program = compile_object(program['main'], program)
+    if "main" in program and program["main"]:
+        program["symbols"] = {}
+        program["hsymbols"] = {}
+        status, compiled_program = compile_object(program["main"], program)
         return status, compiled_program
     else:
-        return 'no main', None
+        return "no main", None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
     import json
 
@@ -183,7 +187,7 @@ if __name__ == '__main__':
 
         status, obj = compile(source_obj)
         if status == OK:
-            print('compiled! = running')
-            pbl.show_source(obj, props= ['src', 'duration'])
+            print("compiled! = running")
+            pbl.show_source(obj, props=["src", "duration"])
         else:
-            print('Whoops', status)
+            print("Whoops", status)

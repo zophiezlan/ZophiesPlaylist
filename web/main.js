@@ -4,8 +4,9 @@ var editor = null;
 var apiLocalPath = 'http://localhost:5000/SmarterPlaylists/';
 var apiRemotePath = 'https://smarterplaylists.playlistmachinery.com/SmarterPlaylists/'
 
-// Default Spotify Client ID (overridden by web/config.json when present)
-var client_id = '31469b011d4941bf8dd4ac9cf8495bac';
+// Spotify Client ID - MUST be configured in web/config.json
+// For security reasons, do not hardcode client IDs in source code
+var client_id = '';
 
 var local_redirect_uri = 'http://localhost:8000/callback.html';
 var remote_redirect_uri = 'https://smarterplaylists.playlistmachinery.com/callback.html';

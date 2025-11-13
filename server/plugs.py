@@ -39,17 +39,10 @@ class IsDayOfWeek(pbl.Conditional):
 class IsTimeOfDay(pbl.Conditional):
     def __init__(self, startTime, endTime, true_source, false_source):
         def bool_func():
-            return datetime.datetime.today().weekday() == day
+            now = datetime.datetime.now().time()
+            return startTime <= now <= endTime
 
-        super(IsDayOfWeek, self).__init__(bool_func, true_source, false_source)
-
-
-class IsTimeOfDay(pbl.Conditional):
-    def __init__(self, startTime, endTime, true_source, false_source):
-        def bool_func():
-            return datetime.datetime.today().weekday() == day
-
-        super(IsDayOfWeek, self).__init__(bool_func, true_source, false_source)
+        super(IsTimeOfDay, self).__init__(bool_func, true_source, false_source)
 
 
 class RandomSelector(object):

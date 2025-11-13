@@ -28,11 +28,15 @@ python-dotenv==1.0.0
 # Spotify API Client (if using spotipy)
 spotipy==2.23.0
 
-# Echo Nest replacement (may need to find alternative or remove)
-# pyen - likely deprecated, needs review
+# ✅ RESOLVED: pbl - Playlist Builder Library
+#    Successfully integrated from https://github.com/plamere/pbl into server/pbl/
+#    Migrated from Python 2 to Python 3
+#    Dependencies: spotipy, requests (both included above)
+#    Status: WORKING - Import test passing
+#    Note: Echo Nest integration disabled (service deprecated)
 
-# PBL (playlist builder library - custom, keep as-is if local)
-# pbl - custom library
+# ❌ pyen - Echo Nest API 
+#    Service shut down in 2016 - imports commented out in pbl code
 
 # Development Dependencies
 # Uncomment these for development

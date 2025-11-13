@@ -1,8 +1,9 @@
 import os
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import cross_origin
 from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
+import logging
 
 import json
 import hashlib
@@ -14,17 +15,61 @@ import traceback
 
 load_dotenv()
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
 app = Flask(__name__)
 app.debug = False
 app.trace = False
 app.testing = False
+
+
+# Validate required environment variables
+def validate_env_vars():
+    """Validate that all required environment variables are set"""
+    required_vars = [
+        "SPOTIPY_CLIENT_ID",
+        "SPOTIPY_CLIENT_SECRET",
+        "SPOTIPY_REDIRECT_URI",
+    ]
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+
+    if missing_vars:
+        error_msg = f"Missing required environment variables: {', '.join(missing_vars)}"
+        logger.error(error_msg)
+        logger.error("Please set these in your .env file or environment")
+        raise EnvironmentError(error_msg)
+
+    logger.info("Environment variables validated successfully")
+
+
+# Validate environment on startup
+validate_env_vars()
 
 # Configure Redis from environment (with sensible defaults)
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
 
-my_redis = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+try:
+    my_redis = redis.Redis(
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        db=REDIS_DB,
+        decode_responses=True,
+        socket_connect_timeout=5,
+        socket_timeout=5,
+    )
+    # Test connection
+    my_redis.ping()
+    logger.info(f"Connected to Redis at {REDIS_HOST}:{REDIS_PORT}")
+except redis.ConnectionError as e:
+    logger.error(f"Failed to connect to Redis: {e}")
+    raise
+
 auth = spotify_auth.SpotifyAuth(r=my_redis)
 
 # Lazy-load program manager and scheduler to avoid importing heavy/optional deps at startup
@@ -60,13 +105,41 @@ def inventory():
 
 @app.route("/healthz")
 def healthz():
-    # Basic health check that does not require importing heavy modules
+    """Comprehensive health check endpoint"""
+    health_status = {"status": "ok", "timestamp": time.time(), "checks": {}}
+
+    all_healthy = True
+
+    # Check Redis connectivity
     try:
-        # Ping Redis if available
         my_redis.ping()
-        return jsonify({"status": "ok"})
+        health_status["checks"]["redis"] = {"status": "ok", "message": "Connected"}
     except Exception as e:
-        return jsonify({"status": "degraded", "message": str(e)}), 200
+        all_healthy = False
+        health_status["checks"]["redis"] = {"status": "error", "message": str(e)}
+        logger.error(f"Redis health check failed: {e}")
+
+    # Check Spotify auth configuration
+    try:
+        if auth.client_id and auth.client_secret:
+            health_status["checks"]["spotify_auth"] = {
+                "status": "ok",
+                "message": "Configured",
+            }
+        else:
+            all_healthy = False
+            health_status["checks"]["spotify_auth"] = {
+                "status": "error",
+                "message": "Missing credentials",
+            }
+    except Exception as e:
+        all_healthy = False
+        health_status["checks"]["spotify_auth"] = {"status": "error", "message": str(e)}
+
+    # Overall status
+    health_status["status"] = "ok" if all_healthy else "degraded"
+
+    return jsonify(health_status), 200 if all_healthy else 503
 
 
 @app.route("/SmarterPlaylists/save", methods=["POST"])
@@ -467,9 +540,10 @@ def user_info():
 
 
 def make_pid(program):
-    js = json.dumps(program)
-    md5 = hashlib.md5(js).hexdigest()
-    return md5
+    """Generate a unique program ID using SHA256 hash"""
+    js = json.dumps(program, sort_keys=True)  # sort_keys for consistency
+    pid_hash = hashlib.sha256(js.encode("utf-8")).hexdigest()
+    return pid_hash[:16]  # Use first 16 chars for compatibility with existing PIDs
 
 
 def is_valid_program(program):
@@ -497,11 +571,13 @@ def run():
 
             for i, tid in enumerate(results["tids"]):
                 if getattr(app, "trace", False):
-                    print(i, pbl.tlib.get_tn(tid))
+                    logger.debug(f"Track {i}: {pbl.tlib.get_tn(tid)}")
                 tracks.append(pbl.tlib.get_track(tid))
-        except Exception:
+        except ImportError as e:
             # If pbl is unavailable, return tids only
-            pass
+            logger.warning(f"pbl library not available, returning track IDs only: {e}")
+        except Exception as e:
+            logger.error(f"Error enriching track info: {e}", exc_info=True)
     return jsonify(results)
 
 
