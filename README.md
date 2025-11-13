@@ -76,6 +76,12 @@ docker-compose up -d
    # Get these from https://developer.spotify.com/dashboard
    ```
 
+   Windows PowerShell equivalent:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+
 4. **Start Redis**
 
    ```bash

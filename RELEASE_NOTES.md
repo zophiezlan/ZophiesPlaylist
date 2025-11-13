@@ -16,8 +16,7 @@ Highlights
 Notes
 
 - Echo Nest-era libraries (pyen) remain optional; some features may be limited
-- Legacy “v2” frontend files remain for reference; primary UI is under web/*.html + main.js
-	- Note: go2.html now redirects to go.html and v2 scripts are deprecated stubs to prevent accidental usage.
+- Legacy “v2” frontend files have been removed. Primary UI is under web/*.html + main.js. Old bookmarks to go2.html and v2 scripts are redirected at the web server.
 
 Upgrade steps
 
